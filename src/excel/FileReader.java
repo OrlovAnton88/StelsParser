@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,9 +40,13 @@ public class FileReader {
     public Collection<Bicycle> getModels() throws PriceReaderException {
         HSSFSheet sheet = getSheet();
         int numerOfRows = sheet.getPhysicalNumberOfRows();
+        Collection<Bicycle> bicycles = new ArrayList<Bicycle>();
         for (int i = rowToStart; i < numerOfRows; i++) {
             Bicycle bicycle = new Bicycle();
             Row row = sheet.getRow(i);
+            if(row == null){
+                break;
+            }
             Cell dirtyModelName = row.getCell(modelNameColumnNum);
             Cell description = row.getCell(descriptionColumnNum);
             Cell price = row.getCell(priceColumnNum);
@@ -50,7 +55,13 @@ public class FileReader {
             } else {
                 throw new PriceReaderException("Name cell is not of string type");
             }
-
+            if (Cell.CELL_TYPE_STRING == description.getCellType()) {
+                FileReadeHelper.parseDescription(description.getStringCellValue(), bicycle);
+            } else {
+                throw new PriceReaderException("Description cell is not of string type");
+            }
+            LOGGER.debug(bicycle.toString());
+          bicycles.add(bicycle);
         }
 
         return null;
@@ -59,7 +70,7 @@ public class FileReader {
     }
 
     private void parseModelName(String cellValue, Bicycle bicycle) {
-        cellValue = cellValue.replace("\r\n", " ").replace("\n", " ");
+        cellValue = cellValue.replace("\r\n", " ").replace("\n", " ").trim();
         int wheelSize = 0;
         String modelName="";
         Pattern p = Pattern.compile(Constants.PATTERN_STANDART_MODEL_FORMAT);
@@ -73,9 +84,9 @@ public class FileReader {
                 String wheelSizeString = extract.substring(0, extract.length() - 1);
                 wheelSize = Integer.valueOf(wheelSizeString);
             }
-            modelName = cellValue.substring(3, cellValue.length()).trim();
+            modelName = cellValue.substring(3, cellValue.length());
             modelName = Constants.STELS + Constants.SPACE_CHAR + modelName;
-            LOGGER.debug('[' + cellValue + "] ModelName [" + modelName + "] Wheel size [" + wheelSize + ']');
+//            LOGGER.debug('[' + cellValue + "] ModelName [" + modelName + "] Wheel size [" + wheelSize + ']');
 
         } else {
             LOGGER.info("Non-Standart model string format: " + cellValue);

@@ -67,17 +67,18 @@ public class Bicycle {
      * @param model
      */
     public void setModel(String model) {
-        String result = model.toLowerCase();
-        result = model.substring(0,1).toUpperCase() + result.substring(1,model.length());
-        result = result.replace("lady", "Lady");
-        if(result.contains("Energy")){
-            result = result.replace(" iii", " III");
-            result = result.replace(" i", " I");
-        }
-        result = result.replace("boy", "Boy");
-        result = result.replace("girl", "Girl");
+        //todo: refactor
+//        String result = model.toLowerCase();
+//        result = model.substring(0,1).toUpperCase() + result.substring(1,model.length());
+//        result = result.replace("lady", "Lady");
+//        if(result.contains("Energy")){
+//            result = result.replace(" iii", " III");
+//            result = result.replace(" i", " I");
+//        }
+//        result = result.replace("boy", "Boy");
+//        result = result.replace("girl", "Girl");
 
-        this.model = result;
+        this.model = model;
     }
 
     public int getWheelsSize() {
@@ -238,6 +239,25 @@ public class Bicycle {
 
     public void setSaddle(String saddle) {
         this.saddle = saddle;
+    }
+
+
+    public String toString(){
+        StringBuffer s = new StringBuffer("Bicycle  - model[");
+        s.append(getModel());
+        s.append("] wheel size[");
+        s.append(getWheelsSize());
+        s.append("] number of speed [");
+        s.append(getSpeedsNum());
+        s.append("] frame [");
+        s.append(getFrameMaterial());
+        s.append("] breaks [");
+        s.append(getBreaks());
+        //todo: finish
+        s.append(']');
+
+        return  s.toString();
+
     }
 
 
