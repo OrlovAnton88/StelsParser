@@ -9,8 +9,8 @@ public class Bicycle {
     private String model;
     private int wheelsSize;
     private int frameSize;
-    private String frameMaterial;
-    private String speedsNum;
+    private String frame;
+    private int speedsNum;
     private String frontFork;
     private String steeringTube;
     /* Каретка */
@@ -97,19 +97,19 @@ public class Bicycle {
         this.frameSize = frameSize;
     }
 
-    public String getFrameMaterial() {
-        return frameMaterial;
+    public String getFrame() {
+        return frame;
     }
 
-    public void setFrameMaterial(String frameMaterial) {
-        this.frameMaterial = frameMaterial;
+    public void setFrame(String frame) {
+        this.frame = frame;
     }
 
-    public String getSpeedsNum() {
+    public int getSpeedsNum() {
         return speedsNum;
     }
 
-    public void setSpeedsNum(String speedsNum) {
+    public void setSpeedsNum(int speedsNum) {
         this.speedsNum = speedsNum;
     }
 
@@ -250,7 +250,7 @@ public class Bicycle {
         s.append("] number of speed [");
         s.append(getSpeedsNum());
         s.append("] frame [");
-        s.append(getFrameMaterial());
+        s.append(getFrame());
         s.append("] breaks [");
         s.append(getBreaks());
         //todo: finish

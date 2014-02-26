@@ -2,7 +2,11 @@ package excel;
 
 import entities.Bicycle;
 import org.apache.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import util.Constants;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -13,20 +17,14 @@ import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import util.Constants;
 
-/**
- * Created with IntelliJ IDEA.
- * User: Mouse
- * Date: 22.02.14
- * Time: 16:04
- * To change this template use File | Settings | File Templates.
- */
 public class FileReader {
+
+    private static FileReader instance = null;
+
+    private FileReader(){
+
+    }
 
     private static Logger LOGGER = Logger.getLogger(FileReader.class);
 
@@ -64,7 +62,7 @@ public class FileReader {
           bicycles.add(bicycle);
         }
 
-        return null;
+        return bicycles;
 
 
     }
@@ -108,5 +106,12 @@ public class FileReader {
             throw new PriceReaderException("Wrong file format: " + e);
         }
         return sheet;
+    }
+
+    public static FileReader getInstance(){
+        if(instance == null){
+            instance = new FileReader();
+        }
+        return instance;
     }
 }

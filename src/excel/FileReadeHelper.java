@@ -2,6 +2,10 @@ package excel;
 
 import entities.Bicycle;
 import org.apache.log4j.Logger;
+import util.Constants;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,6 +17,8 @@ import org.apache.log4j.Logger;
 public class FileReadeHelper {
 
     private static final String FORK = "вилка";
+    private static final String FRAME = "paмa";
+    private static final String FRAME2 = "рама";
     private static final String RIMS = "обода";
     private static final String FENDERS = "крылья";
     private static final String BREAKS = "тормоз";
@@ -25,11 +31,13 @@ public class FileReadeHelper {
 
     public static void parseDescription(String cellValue, Bicycle bicycle) throws PriceReaderException {
         String[] characteristics = cellValue.split(",");
-//        LOGGER.debug("characteristics.length [" + characteristics.length + ']');
-        //todo: default should be 1
-        String speedsStr = characteristics[0];
-        String frameStr = characteristics[1];
 
+        bicycle.setSpeedsNum(getNumberOfSpeeds(characteristics));
+        String frame=null ;
+        if((frame = setParameter(characteristics, FRAME)) == null){
+           frame = setParameter(characteristics, FRAME2);
+        }
+        bicycle.setFrame(frame);
         bicycle.setFrontFork(setParameter(characteristics, FORK));
         bicycle.setRims(setParameter(characteristics, RIMS));
         bicycle.setFenders(setParameter(characteristics, FENDERS));
@@ -52,7 +60,7 @@ public class FileReadeHelper {
 
 
     private static String setDerailleur(String[] str, String parameter) {
-        for (int i = 1; i < str.length; i++) {
+        for (int i = 0; i < str.length; i++) {
             if (str[i].contains(parameter)) {
                 String derailleurs[] = str[i].split("/");
 
@@ -64,7 +72,25 @@ public class FileReadeHelper {
                 }
             }
         }
-        return null;
+        return Constants.NA;
     }
+
+    public static int getNumberOfSpeeds(String [] characteristics) throws PriceReaderException{
+        String speedsStr = characteristics[0].trim();
+        Pattern p = Pattern.compile(Constants.PATTERN_SPEEDS_STRING);
+        Matcher matcher = p.matcher(speedsStr);
+        if(matcher.find()){
+            String str = matcher.group();
+            int delimeter = str.indexOf("-");
+            str = str.substring(0, delimeter);
+//            LOGGER.debug("Speeds str to parse ["+str +']');
+            int speeds = Integer.valueOf(str);
+            return speeds;
+        }else{
+            throw new PriceReaderException("Couldn't parse number of speeds. String["+speedsStr+']');
+        }
+    }
+
+
 
 }

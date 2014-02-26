@@ -1,4 +1,6 @@
+import csv.CSVEngine;
 import excel.FileReader;
+import excel.PriceReaderException;
 import org.apache.log4j.Logger;
 
 /**
@@ -12,10 +14,16 @@ public class ParserEngine {
     private static Logger LOGGER = Logger.getLogger(FileReader.class);
 
     public static void main(String[] args){
-        FileReader reader = new FileReader();
          try{
-        reader.getModels();
-         }catch (Exception ex){
+//        reader.getModels();
+             CSVEngine.getInstance().writeFile();
+
+         } catch (PriceReaderException ex){
+             LOGGER.error(ex);
+
+         }
+
+         catch (Exception ex){
              LOGGER.error(ex);
          }
     }
