@@ -2,7 +2,11 @@ package excel;
 
 import entities.Bicycle;
 import org.apache.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import util.Constants;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -13,20 +17,14 @@ import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import util.Constants;
 
-/**
- * Created with IntelliJ IDEA.
- * User: Mouse
- * Date: 22.02.14
- * Time: 16:04
- * To change this template use File | Settings | File Templates.
- */
 public class FileReader {
+
+    private static FileReader instance = null;
+
+    private FileReader(){
+
+    }
 
     private static Logger LOGGER = Logger.getLogger(FileReader.class);
 
@@ -51,7 +49,11 @@ public class FileReader {
             Cell description = row.getCell(descriptionColumnNum);
             Cell price = row.getCell(priceColumnNum);
             if (Cell.CELL_TYPE_STRING == dirtyModelName.getCellType()) {
-                parseModelName(dirtyModelName.getStringCellValue(), bicycle);
+               String cellValue = dirtyModelName.getStringCellValue();
+                if(cellValue.contains("2013")){
+                    continue;
+                }
+                parseModelName(cellValue, bicycle);
             } else {
                 throw new PriceReaderException("Name cell is not of string type");
             }
@@ -60,18 +62,28 @@ public class FileReader {
             } else {
                 throw new PriceReaderException("Description cell is not of string type");
             }
+            if (Cell.CELL_TYPE_NUMERIC == price.getCellType()) {
+                FileReadeHelper.parsePrice(price.getNumericCellValue(), bicycle);
+            } else {
+                LOGGER.error("Cell cell is not of numeric type. Cell type ["+price.getCellType()+']');
+                bicycle.setPrice(0);
+            }
             LOGGER.debug(bicycle.toString());
           bicycles.add(bicycle);
         }
 
-        return null;
+        FileReadeHelper.removeOldModels(bicycles);
+        return bicycles;
 
 
     }
 
     private void parseModelName(String cellValue, Bicycle bicycle) {
         cellValue = cellValue.replace("\r\n", " ").replace("\n", " ").trim();
-        int wheelSize = 0;
+        //remove Stels sfrom model name
+
+        cellValue = cellValue.replace("STELS", "").trim();
+        String wheelSize = "0";
         String modelName="";
         Pattern p = Pattern.compile(Constants.PATTERN_STANDART_MODEL_FORMAT);
         Matcher matchModel = p.matcher(cellValue);
@@ -81,19 +93,25 @@ public class FileReader {
             Matcher wheelMatcher = wheelPattern.matcher(cellValue);
             if (wheelMatcher.find()) {
                 String extract = wheelMatcher.group().trim();
-                String wheelSizeString = extract.substring(0, extract.length() - 1);
-                wheelSize = Integer.valueOf(wheelSizeString);
+                wheelSize = extract.substring(0, extract.length() - 1);
             }
-            modelName = cellValue.substring(3, cellValue.length());
-            modelName = Constants.STELS + Constants.SPACE_CHAR + modelName;
+            modelName = cellValue.substring(3, cellValue.length()).trim();
 //            LOGGER.debug('[' + cellValue + "] ModelName [" + modelName + "] Wheel size [" + wheelSize + ']');
-
+            bicycle.setModel(modelName);
+            bicycle.setWheelsSize(wheelSize);
         } else {
-            LOGGER.info("Non-Standart model string format: " + cellValue);
+            LOGGER.error("Non-Standart model string format: " + cellValue);
+            LOGGER.info("Trying alternative way");
+            String model = FileReadeHelper.reduceSpaces(cellValue);
+            if(FileReadeHelper.isCrossModel(model)){
+                FileReadeHelper.processCrossModel(model, bicycle);
+            }else if(FileReadeHelper.is275Model(model)){
+              FileReadeHelper.process175Model(model, bicycle);
+            }
         }
+        bicycle.setTrademark(Constants.STELS);
 
-        bicycle.setModel(modelName);
-        bicycle.setWheelsSize(wheelSize);
+
     }
 
     private HSSFSheet getSheet() throws PriceReaderException {
@@ -108,5 +126,12 @@ public class FileReader {
             throw new PriceReaderException("Wrong file format: " + e);
         }
         return sheet;
+    }
+
+    public static FileReader getInstance(){
+        if(instance == null){
+            instance = new FileReader();
+        }
+        return instance;
     }
 }
