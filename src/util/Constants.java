@@ -6,6 +6,7 @@ public class Constants {
     public static final String PRICE_FILE_NAME = "G:\\my\\StelsParser\\res\\price.xls";
 
     public static final String HEADER_FILENAME = "G:\\my\\StelsParser\\res\\columns.txt";
+    public static final String COLOR_FILE_FILENAME = "G:\\my\\StelsParser\\res\\colors.xls";
     public static final String OUTPUT_FILENAME = "G:\\my\\StelsParser\\res\\out.csv";
 
 
