@@ -36,32 +36,6 @@ public class CSVEngineHelper {
         return result.toString().split("\\t");
     }
 
-    public static String generateProdCode(Bicycle bicycle) throws PriceReaderException {
-        String model = bicycle.getModel();
-        if (model == null) {
-            throw new PriceReaderException("model name is null");
-        }
-        StringBuffer result = new StringBuffer("s");
-        model = model.toLowerCase();
-        model = model.replace("(новая модель)", "");
-        model = model.replace("(новый дизайн)", "");
-        model = model.replace("pilot", "p");
-        model = model.replace("miss", "m");
-        model = model.replace("navigator", "n");
-        if(model.indexOf('(')>0){
-            model = model.replaceAll("\\(|\\)", "_").trim();
-        }
-        model = model.replaceAll("\\s", "").trim();
-        result.append(model);
-        result.append(bicycle.getWheelsSize());
-        try{
-            result.append('_');
-            result.append(Constants.YEAR);
-        } catch (StringIndexOutOfBoundsException ex) {
-            throw new PriceReaderException("Error generating product code for model [" + model + ']' + ex);
-        }
-        return result.toString();
-    }
 
 
     private static String getFirstChar(String name) {

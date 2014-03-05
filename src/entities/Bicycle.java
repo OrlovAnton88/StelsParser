@@ -2,8 +2,42 @@ package entities;
 
 import java.util.LinkedList;
 
-public class Bicycle {
+public class Bicycle implements Cloneable {
 
+
+//    public Bicycle(Bicycle bicycle) {
+//        this.productCode = bicycle.getProductCode();
+//        this.price = bicycle.getPrice();
+//        this.colors = bicycle.getColors();
+//        this.trademark = trademark;
+//        this.model = model;
+//        this.wheelsSize = wheelsSize;
+//        this.frameSize = frameSize;
+//        this.frame = frame;
+//        this.speedsNum = speedsNum;
+//        this.frontFork = frontFork;
+//        this.steeringTube = steeringTube;
+//        this.bottomBracket = bottomBracket;
+//        Crankset = crankset;
+//        this.rearHub = rearHub;
+//        this.frontHub = frontHub;
+//        this.freeWheel = freeWheel;
+//        this.frontDerailleur = frontDerailleur;
+//        this.rearDerailleur = rearDerailleur;
+//        this.shifters = shifters;
+//        this.breaks = breaks;
+//        this.rims = rims;
+//        this.tyres = tyres;
+//        this.fenders = fenders;
+//        this.pedals = pedals;
+//        this.saddle = saddle;
+//        this.rack = rack;
+//    }
+
+
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 
     public int getPrice() {
         return price;
@@ -13,8 +47,17 @@ public class Bicycle {
         this.price = price;
     }
 
+    public String getProductCode() {
+        return productCode;
+    }
+
+    public void setProductCode(String productCode) {
+        this.productCode = productCode;
+    }
+
+    private String productCode;
     private int price;
-    private LinkedList<String> colors = new LinkedList<String>();
+    private String colors;
     private String trademark;
     private String model;
     private String wheelsSize;
@@ -53,11 +96,11 @@ public class Bicycle {
         this.rack = rack;
     }
 
-    public LinkedList<String> getColors(){
+    public String getColors(){
         return colors;
     }
-    public void setColors(String str){
-        colors.add(str);
+    public void setColors(String colors){
+        this.colors = colors;
     }
 
     public String getTrademark() {

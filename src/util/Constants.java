@@ -2,11 +2,14 @@ package util;
 
 public class Constants {
 
+    public static final String IMAGES_FOLDER = "D:\\GitHub\\StelsParser\\res\\img\\";
+    public static final String RES_FOLDER = "D:\\GitHub\\StelsParser\\res\\";
 
     public static final String PRICE_FILE_NAME = "D:\\GitHub\\StelsParser\\res\\price.xls";
 
     public static final String HEADER_FILENAME = "D:\\GitHub\\StelsParser\\res\\columns.txt";
     public static final String OUTPUT_FILENAME = "D:\\GitHub\\StelsParser\\res\\out.csv";
+    public static final String COLOR_FILE_FILENAME = "D:\\GitHub\\StelsParser\\res\\colors.xls";
 
 
 

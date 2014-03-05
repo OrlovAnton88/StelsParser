@@ -24,13 +24,13 @@ public class CSVEngine {
     private Collection<Bicycle> bicycles;
     private Collection<String> specialModels;
 
-    private CSVEngine() throws PriceReaderException{
-      bicycles = FileReader.getInstance().getModels();
-      specialModels = CSVEngineHelper.setSpecialKidsModel();
+    private CSVEngine() throws PriceReaderException {
+        bicycles = FileReader.getInstance().getModels();
+        specialModels = CSVEngineHelper.setSpecialKidsModel();
 
     }
 
-    public void writeFile() throws PriceReaderException{
+    public void writeFile() throws PriceReaderException {
 
         CsvWriter csvWriter = null;
         try {
@@ -43,7 +43,7 @@ public class CSVEngine {
                 csvWriter.writeRecord(line);
             }
 
-        } catch (IOException ex )
+        } catch (IOException ex)
 
         {
 
@@ -55,35 +55,22 @@ public class CSVEngine {
 
     }
 
-    private String[] convertModelsIntoArray(Bicycle model){
-        String prodCode;
-        try{
-        prodCode = CSVEngineHelper.generateProdCode(model);
-        }catch (PriceReaderException ex){
-        prodCode = Constants.NA;
-            LOGGER.error("Error generating product code:" + ex);
-        }
+    private String[] convertModelsIntoArray(Bicycle model) {
+        String prodCode = model.getProductCode();
         String[] result = new String[52];
         for (int i = 0; i < 25; i++) {
             result[i] = "";
         }
         result[0] = "-1";
         result[1] = prodCode;
-        result[2] = "Stels " + model.getModel() + " "+ Constants.YEAR;
+        result[2] = "Stels " + model.getModel() + " " + Constants.YEAR;
         result[3] = result[2];
         result[5] = "";
         result[5] = shortDesc(model);
-        try {
-//            result[6] = XlsExtractor.getInstance().getPrice(prodCode, model.getModel()).toString();
-            result[6] = String.valueOf(model.getPrice());
-
-        } catch (Exception ex) {
-            result[6] = "";
-        }
-        LOGGER.debug("model: " + model.getModel() + " | " + prodCode + " | price: " + result[6]);
+        result[6] = String.valueOf(model.getPrice());
         result[8] = "-1";
         result[9] = "0";
-        result[11] = "Stels " + model.getModel() + " "+Constants.YEAR;
+        result[11] = "Stels " + model.getModel() + " " + Constants.YEAR;
         result[12] = "0";
         result[13] = "0";
         result[14] = "1";
@@ -91,10 +78,14 @@ public class CSVEngine {
         result[18] = prodCode + ".jpg," + prodCode + ".jpg," + prodCode + ".jpg";
         result[25] = "Stels";
         result[26] = model.getWheelsSize();
-        result[27] = String.valueOf(model.getFrameSize());
+        String frameSize = String.valueOf(model.getFrameSize());
+        if(frameSize.equals("0")){
+            frameSize="";
+        }
+        result[27] = frameSize;
         result[28] = model.getFrame();
         result[29] = String.valueOf(model.getSpeedsNum());
-        result[30] = model.getColors().toString();
+        result[30] = model.getColors();
         result[32] = model.getFrontFork();
         result[34] = model.getSteeringTube();
         result[35] = model.getBottomBracket();
@@ -132,16 +123,22 @@ public class CSVEngine {
             if (modNum >= 500 && strMod.contains("Navigator")) {
                 result.append("Горный велосипед ");
             } else if (modNum >= 200 && modNum < 390 && strMod.contains("Navigator")) {
-                result.append("Дорожный велосипед ");
+                if (strMod.contains("Lady")) {
+                    result.append("Женский дорожный велосипед ");
+                } else {
+                    result.append("Дорожный велосипед ");
+                }
             } else if (strMod.contains("Cross") || (strMod.contains("Navigator") && modNum == 170)) {
                 result.append("Гибридный велосипед ");
+            } else if (strMod.contains("Miss")) {
+                result.append("Женский горный велосипед ");
             } else if (strMod.contains("Pilot") && (modNum > 300 && modNum < 830)) {
                 result.append("Складной велосипед ");
             } else {
                 result.append("Велосипед ");
             }
         } catch (NumberFormatException ex) {
-//            System.out.println("Can't define bicycle type: " + ex.getMessage());
+            LOGGER.error("Can't define bicycle type: " + ex.getMessage());
             result.append("Велосипед ");
 
         }
@@ -159,19 +156,19 @@ public class CSVEngine {
 
         }
         String frameMaterial = model.getFrame();
-        if(frameMaterial!=null){
-        if (frameMaterial.toLowerCase().contains("ста")) {
-            result.append(" Рама: сталь.");
-        } else if (frameMaterial.toLowerCase().contains("AL")) {
-            result.append(" Рама: алюминий.");
-        }
+        if (frameMaterial != null) {
+            if (frameMaterial.toLowerCase().contains("ста")) {
+                result.append(" Рама: сталь.");
+            } else if (frameMaterial.toLowerCase().contains("AL")) {
+                result.append(" Рама: алюминий.");
+            }
         }
         try {
             int speeds = model.getSpeedsNum();
             result.append(" " + speeds);
             if (speeds == 21 || speeds == 1) {
                 result.append(" скорость. ");
-            } else if (speeds == 18 || speeds == 5 || speeds == 7 || speeds == 6 || speeds ==12) {
+            } else if (speeds == 18 || speeds == 5 || speeds == 7 || speeds == 6 || speeds == 12) {
                 result.append(" скоростей. ");
 
             } else {
@@ -185,18 +182,16 @@ public class CSVEngine {
     }
 
 
-    public boolean isSpecialKidsModel(String model){
-        if(specialModels.contains(model)){
+    public boolean isSpecialKidsModel(String model) {
+        if (specialModels.contains(model)) {
             return true;
         }
         return false;
     }
 
 
-
-
-    public  static CSVEngine getInstance() throws PriceReaderException{
-        if(instance == null){
+    public static CSVEngine getInstance() throws PriceReaderException {
+        if (instance == null) {
             instance = new CSVEngine();
         }
         return instance;

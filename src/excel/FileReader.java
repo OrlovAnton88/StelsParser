@@ -7,6 +7,8 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import util.Constants;
+import util.ImageFileChecker;
+import util.ResizeImg;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -68,11 +70,17 @@ public class FileReader {
                 LOGGER.error("Cell cell is not of numeric type. Cell type ["+price.getCellType()+']');
                 bicycle.setPrice(0);
             }
-            LOGGER.debug(bicycle.toString());
+            LOGGER.debug("Bicycle generated: " + bicycle.toString());
+            FileReadeHelper.generateProdCode(bicycle);
           bicycles.add(bicycle);
+
         }
 
-        FileReadeHelper.removeOldModels(bicycles);
+       FileReadeHelper.removeOldModels(bicycles);
+       FileReadeHelper.addLadyModelsToRoadBikes(bicycles);
+       ColorParser.getInstance().addColors(bicycles);
+       ImageFileChecker.getInstance().checkImages(bicycles);
+        ResizeImg.getInstance().resizeImages(bicycles);
         return bicycles;
 
 
