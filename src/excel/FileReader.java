@@ -9,6 +9,7 @@ import org.apache.poi.ss.usermodel.Row;
 import util.Constants;
 import util.ImageFileChecker;
 import util.ResizeImg;
+import util.YMLGenerator;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -78,9 +79,12 @@ public class FileReader {
 
        FileReadeHelper.removeOldModels(bicycles);
        FileReadeHelper.addLadyModelsToRoadBikes(bicycles);
+       FileReadeHelper.addWheelSizeToModelWithIdenticalNames(bicycles);
        ColorParser.getInstance().addColors(bicycles);
        ImageFileChecker.getInstance().checkImages(bicycles);
-        ResizeImg.getInstance().resizeImages(bicycles);
+       ImageFileChecker.getInstance().addAdditionalImages(bicycles);
+//       ResizeImg.getInstance().resizeImages(bicycles);
+        YMLGenerator.getInstance().generateYMLFile(bicycles);
         return bicycles;
 
 

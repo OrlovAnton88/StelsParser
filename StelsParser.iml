@@ -8,6 +8,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="javacsv" level="project" />
+    <orderEntry type="library" name="imgscalr-lib-4.2" level="project" />
   </component>
 </module>
 

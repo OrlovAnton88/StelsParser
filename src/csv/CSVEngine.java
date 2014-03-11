@@ -75,12 +75,21 @@ public class CSVEngine {
         result[13] = "0";
         result[14] = "1";
         result[16] = "7";
-        result[18] = prodCode + ".jpg," + prodCode + ".jpg," + prodCode + ".jpg";
+//        result[18] = prodCode + ".jpg," + prodCode + ".jpg," + prodCode + ".jpg";
+        if (model.getImageName() != null) {
+            result[18] = model.getImageName() + ',' + model.getImageName() + ',' + model.getImageName();
+        }
+        if (model.getImageName2() != null) {
+            result[19] = model.getImageName2() + ',' + model.getImageName2() + ',' + model.getImageName2();
+        }
+        if (model.getImageName3() != null) {
+            result[20] = model.getImageName3() + ',' + model.getImageName3() + ',' + model.getImageName3();
+        }
         result[25] = "Stels";
         result[26] = model.getWheelsSize();
         String frameSize = String.valueOf(model.getFrameSize());
-        if(frameSize.equals("0")){
-            frameSize="";
+        if (frameSize.equals("0")) {
+            frameSize = "";
         }
         result[27] = frameSize;
         result[28] = model.getFrame();
@@ -107,6 +116,7 @@ public class CSVEngine {
 
         return result;
     }
+
 
     public String shortDesc(Bicycle model) {
         String strMod = model.getModel();

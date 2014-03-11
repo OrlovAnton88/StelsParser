@@ -26,6 +26,26 @@ public class ImageFileChecker {
 
     private static Logger LOGGER = Logger.getLogger(ImageFileChecker.class);
 
+    public void addAdditionalImages(Collection<Bicycle> bicycles) throws PriceReaderException {
+        LOGGER.debug("Starting  additional images adding");
+        Iterator<Bicycle> iterator = bicycles.iterator();
+        while (iterator.hasNext()) {
+            Bicycle bicycle = iterator.next();
+            String productCode = bicycle.getProductCode();
+            if (ifFileExists(Constants.IMAGES_FOLDER, productCode)) {
+                bicycle.setImageName(productCode+".jpg");
+            }
+            if (ifFileExists(Constants.IMAGES_FOLDER, productCode+"_2")) {
+                LOGGER.info("Second image for " + bicycle.getModel() +" ["+ productCode+"_2.jpg]");
+                bicycle.setImageName2(productCode+"_2.jpg");
+            }
+            if (ifFileExists(Constants.IMAGES_FOLDER, productCode+"_3")) {
+                LOGGER.info("Third image for " + bicycle.getModel()  +" ["+productCode +"_3.jpg]");
+                bicycle.setImageName3(productCode+"_3.jpg");
+            }
+        }
+    }
+
     public void checkImages(Collection<Bicycle> bicycles) throws PriceReaderException {
         LOGGER.debug("Starting checking images");
         Collection<String> missingImages = new ArrayList();

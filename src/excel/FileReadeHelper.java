@@ -5,9 +5,7 @@ import org.apache.log4j.Logger;
 import util.Constants;
 
 import java.awt.font.NumericShaper;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,9 +40,9 @@ public class FileReadeHelper {
         if ((frame = setParameter(characteristics, FRAME)) == null) {
             frame = setParameter(characteristics, FRAME2);
         }
-        if(frame!=null){
-        frame = frame.replaceAll("рама","").trim();
-        frame = frame.replaceAll("paмa","").trim();
+        if (frame != null) {
+            frame = frame.replaceAll("рама", "").trim();
+            frame = frame.replaceAll("paмa", "").trim();
         }
         bicycle.setFrame(frame);
         bicycle.setFrontFork(setParameter(characteristics, FORK));
@@ -132,7 +130,7 @@ public class FileReadeHelper {
 
     public static void processCrossModel(String model, Bicycle bicicle) {
         bicicle.setModel(model);
-        bicicle.setWheelsSize("700C");
+        bicicle.setWheelsSize("28");
     }
 
     public static void process175Model(String model, Bicycle bicycle) {
@@ -189,6 +187,7 @@ public class FileReadeHelper {
         model = model.toLowerCase();
         model = model.replace("(новая модель)", "");
         model = model.replace("(новый дизайн)", "");
+        model = model.replace("cross", "");
         model = model.replace("pilot", "p");
         model = model.replace("miss", "m");
         model = model.replace("navigator", "n");
@@ -208,7 +207,7 @@ public class FileReadeHelper {
     }
 
 
-    public static void addLadyModelsToRoadBikes(Collection<Bicycle> bicycles) throws PriceReaderException{
+    public static void addLadyModelsToRoadBikes(Collection<Bicycle> bicycles) throws PriceReaderException {
         Collection<Bicycle> newBikes = new ArrayList<Bicycle>();
         java.util.Iterator<Bicycle> iterator = bicycles.iterator();
         while (iterator.hasNext()) {
@@ -218,7 +217,7 @@ public class FileReadeHelper {
                 Bicycle newBicycle = null;
                 try {
                     newBicycle = (Bicycle) bicycle.clone();
-                    newBicycle.setModel(bicycle.getModel()+" Lady");
+                    newBicycle.setModel(bicycle.getModel() + " Lady");
                 } catch (CloneNotSupportedException ex) {
                     LOGGER.error(ex);
                 }
@@ -230,5 +229,26 @@ public class FileReadeHelper {
         bicycles.addAll(newBikes);
     }
 
+    public static void addWheelSizeToModelWithIdenticalNames(Collection<Bicycle> bicycles) {
+        Iterator<Bicycle> iterator = bicycles.iterator();
+        Set<String> uniqueModes = new HashSet<String>();
+        Set<String> sameModelName = new HashSet<String>();
+        while (iterator.hasNext()) {
+            Bicycle bicycle = iterator.next();
+            String modelName = bicycle.getModel();
+            boolean unique = uniqueModes.add(modelName);
+            if (!unique) {
+                sameModelName.add(modelName);
+            }
+        }
+        Iterator<Bicycle> secondIterator = bicycles.iterator();
+        while (secondIterator.hasNext()) {
+            Bicycle bicycle = secondIterator.next();
+            String modelName = bicycle.getModel();
+            if (sameModelName.contains(modelName)) {
+                bicycle.setModel(modelName + " " + bicycle.getWheelsSize());
+            }
+        }
+    }
 
 }

@@ -39,6 +39,9 @@ public class Bicycle implements Cloneable {
         return super.clone();
     }
 
+
+
+
     public int getPrice() {
         return price;
     }
@@ -54,6 +57,35 @@ public class Bicycle implements Cloneable {
     public void setProductCode(String productCode) {
         this.productCode = productCode;
     }
+
+    private String imageName;
+
+    public String getImageName3() {
+        return imageName3;
+    }
+
+    public void setImageName3(String imageName3) {
+        this.imageName3 = imageName3;
+    }
+
+    public String getImageName() {
+        return imageName;
+    }
+
+    public void setImageName(String imageName) {
+        this.imageName = imageName;
+    }
+
+    public String getImageName2() {
+        return imageName2;
+    }
+
+    public void setImageName2(String imageName2) {
+        this.imageName2 = imageName2;
+    }
+
+    private String imageName2;
+    private String imageName3;
 
     private String productCode;
     private int price;

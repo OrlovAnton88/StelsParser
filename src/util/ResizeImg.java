@@ -3,6 +3,7 @@ package util;
 import entities.Bicycle;
 import excel.PriceReaderException;
 import org.apache.log4j.Logger;
+import org.imgscalr.Scalr;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -36,51 +37,37 @@ public class ResizeImg {
         Collection<String> missingImages = new ArrayList();
         Iterator<Bicycle> iterator = bicycles.iterator();
         while (iterator.hasNext()) {
-            String productCode = iterator.next().getProductCode();
-            if (ifFileExists("D:\\GitHub\\StelsParser\\res\\img\\", productCode)) {
-                try {
-                    BufferedImage originalImage = ImageIO.read(new File("D:\\GitHub\\StelsParser\\res\\img\\" + productCode + ".jpg"));
-                    int type = originalImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : originalImage.getType();
-
-                    BufferedImage resizeImageJpg = resizeImageWithHint(originalImage, type);
-                    ImageIO.write(resizeImageJpg, "jpg", new File("D:\\GitHub\\StelsParser\\res\\img_medium\\" +productCode+ ".jpg"));
-                } catch (IOException ex) {
-                    throw new PriceReaderException("Resizing images"+ex.getMessage());
-                }
-
-            }
+            Bicycle bicycle = iterator.next();
+//            LOGGER.debug("Processing " + bicycle.toString());
+            doAction(bicycle.getImageName());
+            doAction(bicycle.getImageName2());
+            doAction(bicycle.getImageName3());
         }
     }
 
-    private static BufferedImage resizeImageWithHint(BufferedImage originalImage, int type) {
-        int original_width = originalImage.getWidth();
-        int original_height = originalImage.getHeight();
+    private void doAction(String imageName) throws PriceReaderException {
+        if (imageName != null && ifFileExists("D:\\GitHub\\StelsParser\\res\\images_to_add\\", imageName)) {
+            try {
+                BufferedImage originalImage = ImageIO.read(new File("D:\\GitHub\\StelsParser\\res\\images_to_add\\" + imageName));
 
-        int ratio = original_width/IMG_WIDTH350;
-        int newHeight = original_height/ratio;
+                BufferedImage image150 = Scalr.resize(originalImage, Scalr.Method.ULTRA_QUALITY, Scalr.Mode.FIT_TO_WIDTH, IMG_WIDTH);
+                ImageIO.write(image150, "jpg", new File("D:\\GitHub\\StelsParser\\res\\images_to_add\\1_small\\" + imageName));
 
+                BufferedImage image350 = Scalr.resize(originalImage, Scalr.Method.ULTRA_QUALITY, Scalr.Mode.FIT_TO_WIDTH, IMG_WIDTH350);
+                ImageIO.write(image350, "jpg", new File("D:\\GitHub\\StelsParser\\res\\images_to_add\\1_medium\\" + imageName));
+            } catch (IOException ex) {
+                throw new PriceReaderException("Resizing images" + ex.getMessage());
+            } catch (Exception ex){
+                throw  new PriceReaderException("Something wrong with image[" +imageName+']');
+            }
 
+        }
 
-
-        BufferedImage resizedImage = new BufferedImage(IMG_WIDTH350, newHeight, type);
-        Graphics2D g = resizedImage.createGraphics();
-        g.drawImage(originalImage, 0, 0, IMG_WIDTH350, newHeight, null);
-        g.dispose();
-        g.setComposite(AlphaComposite.Src);
-
-        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        g.setRenderingHint(RenderingHints.KEY_RENDERING,
-                RenderingHints.VALUE_RENDER_QUALITY);
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_ON);
-
-        return resizedImage;
     }
 
 
     private boolean ifFileExists(String path, String filename) {
-        File file = new File(path + filename + ".jpg");
+        File file = new File(path + filename);
         return file.exists();
     }
 
