@@ -25,7 +25,7 @@ public class FileReader {
 
     private static FileReader instance = null;
 
-    private FileReader(){
+    private FileReader() {
 
     }
 
@@ -35,7 +35,7 @@ public class FileReader {
 
     private static final int modelNameColumnNum = 0;
     private static final int descriptionColumnNum = 1;
-    private static final int priceColumnNum = 5;
+    private static final int priceColumnNum = 2;
 
 
     public Collection<Bicycle> getModels() throws PriceReaderException {
@@ -45,15 +45,15 @@ public class FileReader {
         for (int i = rowToStart; i < numerOfRows; i++) {
             Bicycle bicycle = new Bicycle();
             Row row = sheet.getRow(i);
-            if(row == null){
+            if (row == null) {
                 break;
             }
             Cell dirtyModelName = row.getCell(modelNameColumnNum);
             Cell description = row.getCell(descriptionColumnNum);
             Cell price = row.getCell(priceColumnNum);
             if (Cell.CELL_TYPE_STRING == dirtyModelName.getCellType()) {
-               String cellValue = dirtyModelName.getStringCellValue();
-                if(cellValue.contains("2013")){
+                String cellValue = dirtyModelName.getStringCellValue();
+                if (cellValue.contains("2013")) {
                     continue;
                 }
                 parseModelName(cellValue, bicycle);
@@ -68,23 +68,14 @@ public class FileReader {
             if (Cell.CELL_TYPE_NUMERIC == price.getCellType()) {
                 FileReadeHelper.parsePrice(price.getNumericCellValue(), bicycle);
             } else {
-                LOGGER.error("Cell cell is not of numeric type. Cell type ["+price.getCellType()+']');
+                LOGGER.error("Cell cell is not of numeric type. Cell type [" + price.getCellType() + ']');
                 bicycle.setPrice(0);
             }
             LOGGER.debug("Bicycle generated: " + bicycle.toString());
             FileReadeHelper.generateProdCode(bicycle);
-          bicycles.add(bicycle);
+            bicycles.add(bicycle);
 
         }
-
-       FileReadeHelper.removeOldModels(bicycles);
-       FileReadeHelper.addLadyModelsToRoadBikes(bicycles);
-       FileReadeHelper.addWheelSizeToModelWithIdenticalNames(bicycles);
-       ColorParser.getInstance().addColors(bicycles);
-       ImageFileChecker.getInstance().checkImages(bicycles);
-       ImageFileChecker.getInstance().addAdditionalImages(bicycles);
-//       ResizeImg.getInstance().resizeImages(bicycles);
-        YMLGenerator.getInstance().generateYMLFile(bicycles);
         return bicycles;
 
 
@@ -96,7 +87,7 @@ public class FileReader {
 
         cellValue = cellValue.replace("STELS", "").trim();
         String wheelSize = "0";
-        String modelName="";
+        String modelName = "";
         Pattern p = Pattern.compile(Constants.PATTERN_STANDART_MODEL_FORMAT);
         Matcher matchModel = p.matcher(cellValue);
 
@@ -108,17 +99,18 @@ public class FileReader {
                 wheelSize = extract.substring(0, extract.length() - 1);
             }
             modelName = cellValue.substring(3, cellValue.length()).trim();
-//            LOGGER.debug('[' + cellValue + "] ModelName [" + modelName + "] Wheel size [" + wheelSize + ']');
-            bicycle.setModel(modelName);
+            modelName = FileReadeHelper.reduceSpaces(modelName);
+                bicycle.setModel(modelName);
+
             bicycle.setWheelsSize(wheelSize);
         } else {
             LOGGER.error("Non-Standart model string format: " + cellValue);
             LOGGER.info("Trying alternative way");
             String model = FileReadeHelper.reduceSpaces(cellValue);
-            if(FileReadeHelper.isCrossModel(model)){
+            if (FileReadeHelper.isCrossModel(model)) {
                 FileReadeHelper.processCrossModel(model, bicycle);
-            }else if(FileReadeHelper.is275Model(model)){
-              FileReadeHelper.process175Model(model, bicycle);
+            } else if (FileReadeHelper.is275Model(model)) {
+                FileReadeHelper.process175Model(model, bicycle);
             }
         }
         bicycle.setTrademark(Constants.STELS);
@@ -140,8 +132,8 @@ public class FileReader {
         return sheet;
     }
 
-    public static FileReader getInstance(){
-        if(instance == null){
+    public static FileReader getInstance() {
+        if (instance == null) {
             instance = new FileReader();
         }
         return instance;

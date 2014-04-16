@@ -9,6 +9,7 @@ public class Constants {
 
     public static final String HEADER_FILENAME = "D:\\GitHub\\StelsParser\\res\\columns.txt";
     public static final String OUTPUT_FILENAME = "D:\\GitHub\\StelsParser\\res\\out.csv";
+    public static final String OUTPUT_FILENAME_CODE_AND_PRICE = "D:\\GitHub\\StelsParser\\res\\out_code_and_price.csv";
     public static final String COLOR_FILE_FILENAME = "D:\\GitHub\\StelsParser\\res\\colors.xls";
 
 

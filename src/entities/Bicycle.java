@@ -1,38 +1,80 @@
 package entities;
 
+import java.util.Collection;
 import java.util.LinkedList;
 
 public class Bicycle implements Cloneable {
 
+    private String imageName;
+    private String imageName2;
+    private String imageName3;
 
-//    public Bicycle(Bicycle bicycle) {
-//        this.productCode = bicycle.getProductCode();
-//        this.price = bicycle.getPrice();
-//        this.colors = bicycle.getColors();
-//        this.trademark = trademark;
-//        this.model = model;
-//        this.wheelsSize = wheelsSize;
-//        this.frameSize = frameSize;
-//        this.frame = frame;
-//        this.speedsNum = speedsNum;
-//        this.frontFork = frontFork;
-//        this.steeringTube = steeringTube;
-//        this.bottomBracket = bottomBracket;
-//        Crankset = crankset;
-//        this.rearHub = rearHub;
-//        this.frontHub = frontHub;
-//        this.freeWheel = freeWheel;
-//        this.frontDerailleur = frontDerailleur;
-//        this.rearDerailleur = rearDerailleur;
-//        this.shifters = shifters;
-//        this.breaks = breaks;
-//        this.rims = rims;
-//        this.tyres = tyres;
-//        this.fenders = fenders;
-//        this.pedals = pedals;
-//        this.saddle = saddle;
-//        this.rack = rack;
-//    }
+
+    private String productCode;
+    private int price;
+    private String colors;
+    private String trademark;
+    private String model;
+    private String wheelsSize;
+    private int frameSize;
+    private String frame;
+    private int speedsNum;
+    private String frontFork;
+    private String steeringTube;
+    /* Каретка */
+    private String bottomBracket;
+    /* шатуны */
+    private String crankset;
+    private String rearHub;
+    private String frontHub;
+    /*Трешетка*/
+    private String freeWheel;
+
+    private String frontDerailleur;
+    private String rearDerailleur;
+    private String shifters;
+    private String breaks;
+    /*обода*/
+    private String rims;
+    private String tyres;
+    /*Крылья*/
+    private String fenders;
+    private String pedals;
+    private String saddle;
+    /*багажник*/
+    private String rack;
+
+    public String url;
+    public Integer categoryId;
+    private String shortDescription;
+
+
+
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public Integer getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Integer category) {
+        this.categoryId = category;
+    }
+
+    public String getShortDescription() {
+        return shortDescription;
+    }
+
+    public void setShortDescription(String shortDescription) {
+        this.shortDescription = shortDescription;
+    }
+
 
 
     public Object clone() throws CloneNotSupportedException {
@@ -58,8 +100,6 @@ public class Bicycle implements Cloneable {
         this.productCode = productCode;
     }
 
-    private String imageName;
-
     public String getImageName3() {
         return imageName3;
     }
@@ -84,42 +124,7 @@ public class Bicycle implements Cloneable {
         this.imageName2 = imageName2;
     }
 
-    private String imageName2;
-    private String imageName3;
 
-    private String productCode;
-    private int price;
-    private String colors;
-    private String trademark;
-    private String model;
-    private String wheelsSize;
-    private int frameSize;
-    private String frame;
-    private int speedsNum;
-    private String frontFork;
-    private String steeringTube;
-    /* Каретка */
-    private String bottomBracket;
-    /* шатуны */
-    private String Crankset;
-    private String rearHub;
-    private String frontHub;
-    /*Трешетка*/
-    private String freeWheel;
-
-    private String frontDerailleur;
-    private String rearDerailleur;
-    private String shifters;
-    private String breaks;
-    /*обода*/
-    private String rims;
-    private String tyres;
-    /*Крылья*/
-    private String fenders;
-    private String pedals;
-    private String saddle;
-    /*багажник*/
-    private String rack;
 
     public  String getRack(){
         return  rack;
@@ -223,11 +228,11 @@ public class Bicycle implements Cloneable {
     }
 
     public String getCrankset() {
-        return Crankset;
+        return crankset;
     }
 
     public void setCrankset(String crankset) {
-        Crankset = crankset;
+        crankset = crankset;
     }
 
     public String getRearHub() {

@@ -1,7 +1,14 @@
 import csv.CSVEngine;
+import entities.Bicycle;
+import excel.ColorParser;
+import excel.FileReadeHelper;
 import excel.FileReader;
 import excel.PriceReaderException;
 import org.apache.log4j.Logger;
+import util.ImageFileChecker;
+import util.YMLGenerator;
+
+import java.util.Collection;
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,18 +20,33 @@ import org.apache.log4j.Logger;
 public class ParserEngine {
     private static Logger LOGGER = Logger.getLogger(FileReader.class);
 
-    public static void main(String[] args){
-         try{
-//        reader.getModels();
-             CSVEngine.getInstance().writeFile();
+    public static void main(String[] args) {
+        try {
+            LOGGER.debug("Starting...");
+            Collection<Bicycle> bicycles = FileReader.getInstance().getModels();
+            LOGGER.debug("Removing old models...");
+            FileReadeHelper.removeOldModels(bicycles);
+            FileReadeHelper.addLadyModelsToRoadBikes(bicycles);
+            FileReadeHelper.addWheelSizeToModelWithIdenticalNames(bicycles);
+            FileReadeHelper.generateShortDescription(bicycles);
+            FileReadeHelper.addWheelSizeToSomeKidsModels(bicycles);
+            ColorParser.getInstance().addColors(bicycles);
 
-         } catch (PriceReaderException ex){
-             LOGGER.error(ex);
+            ImageFileChecker.getInstance().checkImages(bicycles);
+            ImageFileChecker.getInstance().addAdditionalImages(bicycles);
+//       ResizeImg.getInstance().resizeImages(bicycles);
+            CSVEngine.getInstance().writeFullFile(bicycles);
+            CSVEngine.getInstance().writeCodeAndPriceFile(bicycles);
+            YMLGenerator.getInstance().generateYMLFile(bicycles);
 
-         }
+            LOGGER.debug("Finish");
 
-         catch (Exception ex){
-             LOGGER.error(ex);
-         }
+
+        } catch (PriceReaderException ex) {
+            LOGGER.error(ex);
+
+        } catch (Exception ex) {
+            LOGGER.error(ex);
+        }
     }
 }

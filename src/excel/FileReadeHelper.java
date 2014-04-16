@@ -77,8 +77,6 @@ public class FileReadeHelper {
     public static void parsePrice(double cellValue, Bicycle bicycle) throws PriceReaderException {
         int price = (int) Math.round(cellValue);
         bicycle.setPrice(price);
-
-
     }
 
 
@@ -250,5 +248,107 @@ public class FileReadeHelper {
             }
         }
     }
+
+    public static void addWheelSizeToSomeKidsModels(Collection<Bicycle> bicycles){
+        Iterator<Bicycle> iterator = bicycles.iterator();
+        Set <String> kidsModelsToAddWheelsSize = getModelsToAddwheelSize();
+        while (iterator.hasNext()) {
+            Bicycle bicycle = iterator.next();
+            if(kidsModelsToAddWheelsSize.contains(bicycle.getModel())){
+                bicycle.setModel(bicycle.getModel() + " " + bicycle.getWheelsSize());
+            }
+
+        }
+
+    }
+    private static Set<String> getModelsToAddwheelSize(){
+        Set<String> set = new HashSet<String>();
+        set.add("Fortune");
+        set.add("Talisman (chrome)");
+        set.add("Pilot 180 (новый дизайн)");
+        set.add("Pilot 120");
+        return set;
+    }
+
+    public static void generateShortDescription(Collection<Bicycle> bicycles) {
+        Collection modelNamesToRemove = new ArrayList();
+        for (Bicycle bicycle : bicycles) {
+            bicycle.setShortDescription(getShortDescription(bicycle));
+        }
+    }
+
+    public static String getShortDescription(Bicycle model) {
+        String strMod = model.getModel();
+        StringBuffer result = new StringBuffer();
+        try {
+            Pattern p = Pattern.compile("\\d\\d\\d");
+            //  get a matcher object
+            Matcher m = p.matcher(strMod);
+            String tmp = "";
+            if (m.find()) {
+                tmp = m.group();
+            }
+            int modNum = Integer.parseInt(tmp);
+            if (modNum >= 500 && strMod.contains("Navigator")) {
+                result.append("Горный велосипед ");
+            } else if (modNum >= 200 && modNum < 390 && strMod.contains("Navigator")) {
+                if (strMod.contains("Lady")) {
+                    result.append("Женский дорожный велосипед ");
+                } else {
+                    result.append("Дорожный велосипед ");
+                }
+            } else if (strMod.contains("Cross") || (strMod.contains("Navigator") && modNum == 170)) {
+                result.append("Гибридный велосипед ");
+            } else if (strMod.contains("Miss")) {
+                result.append("Женский горный велосипед ");
+            } else if (strMod.contains("Pilot") && (modNum > 300 && modNum < 830)) {
+                result.append("Складной велосипед ");
+            } else {
+                result.append("Велосипед ");
+            }
+        } catch (NumberFormatException ex) {
+            LOGGER.error("Can't define bicycle type: " + ex.getMessage());
+            result.append("Велосипед ");
+
+        }
+        String wheels = model.getWheelsSize();
+        if (wheels.equals("24")) {
+            result.append("с колесами " + wheels + " дюйма.");
+        } else {
+            result.append("с колесами " + wheels + " дюймов.");
+        }
+
+        if (strMod.toLowerCase().contains("disc")) {
+            int size = result.length();
+            result.delete(size - 1, size);
+            result.append(" и дисковыми тормозами. ");
+
+        }
+        String frameMaterial = model.getFrame();
+        if (frameMaterial != null) {
+            if (frameMaterial.toLowerCase().contains("ста")) {
+                result.append(" Рама: сталь.");
+            } else if (frameMaterial.toLowerCase().contains("AL")) {
+                result.append(" Рама: алюминий.");
+            }
+        }
+        try {
+            int speeds = model.getSpeedsNum();
+            result.append(" " + speeds);
+            if (speeds == 21 || speeds == 1) {
+                result.append(" скорость. ");
+            } else if (speeds == 18 || speeds == 5 || speeds == 7 || speeds == 6 || speeds == 12) {
+                result.append(" скоростей. ");
+
+            } else {
+                result.append(" скорости. ");
+            }
+        } catch (NumberFormatException ex) {
+            System.out.println("Cant parse speeds number: " + ex.getMessage());
+        }
+
+        return result.toString();
+    }
+
 
 }

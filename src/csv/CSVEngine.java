@@ -8,10 +8,13 @@ import excel.PriceReaderException;
 import org.apache.log4j.Logger;
 import util.Constants;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Collection;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,20 +24,26 @@ public class CSVEngine {
 
     private static CSVEngine instance;
 
-    private Collection<Bicycle> bicycles;
-    private Collection<String> specialModels;
+//    private Collection<Bicycle> bicycles;
 
     private CSVEngine() throws PriceReaderException {
-        bicycles = FileReader.getInstance().getModels();
-        specialModels = CSVEngineHelper.setSpecialKidsModel();
+//        bicycles = FileReader.getInstance().getModels();
 
     }
 
-    public void writeFile() throws PriceReaderException {
+    public void writeFullFile(Collection<Bicycle> bicycles) throws PriceReaderException {
 
         CsvWriter csvWriter = null;
         try {
-            FileOutputStream fileOutputStream = new FileOutputStream(Constants.OUTPUT_FILENAME);
+            File file = new File(Constants.OUTPUT_FILENAME);
+            if (file.exists()) {
+                if (!file.delete()) {
+                    LOGGER.error("Unable to delete file[" + file.getAbsolutePath() + ']');
+                    LOGGER.error("Creating temporary file");
+                    file = new File(Constants.RES_FOLDER + "out" + new Date().getTime() + ".csv");
+                }
+            }
+            FileOutputStream fileOutputStream = new FileOutputStream(file);
             csvWriter = new CsvWriter(fileOutputStream, ';', Charset.forName("CP1251"));
             String[] line = CSVEngineHelper.getHeader();
             csvWriter.writeRecord(line);
@@ -42,11 +51,46 @@ public class CSVEngine {
                 line = convertModelsIntoArray(model);
                 csvWriter.writeRecord(line);
             }
+        } catch (FileNotFoundException ex) {
+            throw new PriceReaderException("Error writing .csv file. " + ex);
 
-        } catch (IOException ex)
+        } catch (IOException ex) {
+            throw new PriceReaderException("Error writing .csv file. " + ex);
+        } finally
 
         {
+            csvWriter.close();
+        }
 
+    }
+
+
+    public void writeCodeAndPriceFile(Collection<Bicycle> bicycles) throws PriceReaderException {
+
+        CsvWriter csvWriter = null;
+        try {
+            File file = new File(Constants.OUTPUT_FILENAME_CODE_AND_PRICE);
+            if (file.exists()) {
+                if (!file.delete()) {
+                    LOGGER.error("Unable to delete file[" + file.getAbsolutePath() + ']');
+                    LOGGER.error("Creating temporary file");
+                    file = new File(Constants.RES_FOLDER + "out_code_and_price" + new Date().getTime() + ".csv");
+                }
+            }
+            FileOutputStream fileOutputStream = new FileOutputStream(file);
+            csvWriter = new CsvWriter(fileOutputStream, ';', Charset.forName("CP1251"));
+            String[] line = {"Код", "Цена"};
+            csvWriter.writeRecord(line);
+            for (Bicycle bicycle : bicycles) {
+                line = new String[]{bicycle.getProductCode(), String.valueOf(bicycle.getPrice())};
+                csvWriter.writeRecord(line);
+
+            }
+        } catch (FileNotFoundException ex) {
+            throw new PriceReaderException("Error writing .csv file. " + ex);
+
+        } catch (IOException ex) {
+            throw new PriceReaderException("Error writing .csv file. " + ex);
         } finally
 
         {
@@ -66,7 +110,7 @@ public class CSVEngine {
         result[2] = "Stels " + model.getModel() + " " + Constants.YEAR;
         result[3] = result[2];
         result[5] = "";
-        result[5] = shortDesc(model);
+        result[5] = model.getShortDescription();
         result[6] = String.valueOf(model.getPrice());
         result[8] = "-1";
         result[9] = "0";
@@ -115,88 +159,6 @@ public class CSVEngine {
         result[51] = model.getRack();
 
         return result;
-    }
-
-
-    public String shortDesc(Bicycle model) {
-        String strMod = model.getModel();
-        StringBuffer result = new StringBuffer();
-        try {
-            Pattern p = Pattern.compile("\\d\\d\\d");
-            //  get a matcher object
-            Matcher m = p.matcher(strMod);
-            String tmp = "";
-            if (m.find()) {
-                tmp = m.group();
-            }
-            int modNum = Integer.parseInt(tmp);
-            if (modNum >= 500 && strMod.contains("Navigator")) {
-                result.append("Горный велосипед ");
-            } else if (modNum >= 200 && modNum < 390 && strMod.contains("Navigator")) {
-                if (strMod.contains("Lady")) {
-                    result.append("Женский дорожный велосипед ");
-                } else {
-                    result.append("Дорожный велосипед ");
-                }
-            } else if (strMod.contains("Cross") || (strMod.contains("Navigator") && modNum == 170)) {
-                result.append("Гибридный велосипед ");
-            } else if (strMod.contains("Miss")) {
-                result.append("Женский горный велосипед ");
-            } else if (strMod.contains("Pilot") && (modNum > 300 && modNum < 830)) {
-                result.append("Складной велосипед ");
-            } else {
-                result.append("Велосипед ");
-            }
-        } catch (NumberFormatException ex) {
-            LOGGER.error("Can't define bicycle type: " + ex.getMessage());
-            result.append("Велосипед ");
-
-        }
-        String wheels = model.getWheelsSize();
-        if (wheels.equals("24")) {
-            result.append("с колесами " + wheels + " дюйма.");
-        } else {
-            result.append("с колесами " + wheels + " дюймов.");
-        }
-
-        if (strMod.toLowerCase().contains("disc")) {
-            int size = result.length();
-            result.delete(size - 1, size);
-            result.append(" и дисковыми тормозами. ");
-
-        }
-        String frameMaterial = model.getFrame();
-        if (frameMaterial != null) {
-            if (frameMaterial.toLowerCase().contains("ста")) {
-                result.append(" Рама: сталь.");
-            } else if (frameMaterial.toLowerCase().contains("AL")) {
-                result.append(" Рама: алюминий.");
-            }
-        }
-        try {
-            int speeds = model.getSpeedsNum();
-            result.append(" " + speeds);
-            if (speeds == 21 || speeds == 1) {
-                result.append(" скорость. ");
-            } else if (speeds == 18 || speeds == 5 || speeds == 7 || speeds == 6 || speeds == 12) {
-                result.append(" скоростей. ");
-
-            } else {
-                result.append(" скорости. ");
-            }
-        } catch (NumberFormatException ex) {
-            System.out.println("Cant parse speeds number: " + ex.getMessage());
-        }
-
-        return result.toString();
-    }
-
-
-    public boolean isSpecialKidsModel(String model) {
-        if (specialModels.contains(model)) {
-            return true;
-        }
-        return false;
     }
 
 
